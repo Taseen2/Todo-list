@@ -7,6 +7,31 @@ struct Task {
     string title;
     bool isCompleted;
 };
+void addTask(vector<Task>& tasks) {
+    Task newTask;
+    newTask.id = tasks.size() + 1; // Assign unique ID
+    cout << "Enter task description: ";
+    cin.ignore(); // To clear the newline character
+    getline(cin, newTask.title); // Get full-line input
+    newTask.isCompleted = false; // Default: not completed
+
+    tasks.push_back(newTask); // Add to the list
+    cout << "Task added successfully!\n";
+}
+void viewTasks(const vector<Task>& tasks) {
+    if (tasks.empty()) {
+        cout << "No tasks available.\n";
+        return;
+    }
+
+    cout << "\n===== Task List =====\n";
+    for (const auto& task : tasks) {
+        cout << "ID: " << task.id << " | ";
+        cout << "Task: " << task.title << " | ";
+        cout << "Status: " << (task.isCompleted ? "Completed" : "Not Completed") << endl;
+    }
+}
+
 int main() {
     vector<Task> tasks; // List to store tasks
     int choice;
@@ -23,10 +48,10 @@ int main() {
 
         switch (choice) {
             case 1:
-                // Function to add task (we'll implement next)
+                addTask(tasks);
                 break;
             case 2:
-                // Function to view tasks
+                viewTasks(tasks);
                 break;
             case 3:
                 // Function to mark a task as completed
