@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <fstream> // For file handling
+#include <algorithm>  
 using namespace std;
 struct Task {
     int id;
@@ -31,6 +32,56 @@ void viewTasks(const vector<Task>& tasks) {
         cout << "Status: " << (task.isCompleted ? "Completed" : "Not Completed") << endl;
     }
 }
+void markTaskCompleted(vector<Task>& tasks) {
+    if (tasks.empty()) {
+        cout << "No tasks available to complete.\n";
+        return;
+    }
+
+    int taskId;
+    cout << "Enter Task ID to mark as completed: ";
+    cin >> taskId;
+
+    bool found = false;
+    for (auto& task : tasks) {
+        if (task.id == taskId) {
+            task.isCompleted = true;
+            cout << "Task marked as completed!\n";
+            found = true;
+            break;
+        }
+    }
+
+    if (!found) {
+        cout << "Task ID not found.\n";
+    }
+}
+void deleteTask(vector<Task>& tasks) {
+    if (tasks.empty()) {
+        cout << "No tasks available to delete.\n";
+        return;
+    }
+
+    int taskId;
+    cout << "Enter Task ID to delete: ";
+    cin >> taskId;
+
+    auto it = remove_if(tasks.begin(), tasks.end(), [&](const Task& task) {
+        return task.id == taskId;
+    });
+
+    if (it != tasks.end()) {
+        tasks.erase(it, tasks.end());
+        cout << "Task deleted successfully!\n";
+
+        // Reassign IDs after deletion
+        for (size_t i = 0; i < tasks.size(); ++i) {
+            tasks[i].id = i + 1;
+        }
+    } else {
+        cout << "Task ID not found.\n";
+    }
+}
 
 int main() {
     vector<Task> tasks; // List to store tasks
@@ -54,10 +105,10 @@ int main() {
                 viewTasks(tasks);
                 break;
             case 3:
-                // Function to mark a task as completed
+                markTaskCompleted(tasks);
                 break;
             case 4:
-                // Function to delete a task
+                deleteTask(tasks);
                 break;
             case 5:
                 cout << "Exiting...\n";
