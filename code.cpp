@@ -1,13 +1,31 @@
 #include <iostream>
 #include <vector>
-#include <fstream> // For file handling
+#include <fstream> 
 #include <algorithm>  
+#include <sstream>
+#include <string>
 using namespace std;
 struct Task {
     int id;
     string title;
     bool isCompleted;
+
+    string toString() const {
+        return to_string(id) + "," + title + "," + (isCompleted ? "1" : "0");
+    }
+
+    // Convert a string line from file to Task object
+    static Task fromString(const string& line) {
+        Task task;
+        stringstream ss(line);
+        string temp;
+        getline(ss, temp, ','); task.id = stoi(temp);
+        getline(ss, task.title, ',');
+        getline(ss, temp, ','); task.isCompleted = (temp == "1");
+        return task;
+    }
 };
+
 void addTask(vector<Task>& tasks) {
     Task newTask;
     newTask.id = tasks.size() + 1; // Assign unique ID
@@ -82,11 +100,35 @@ void deleteTask(vector<Task>& tasks) {
         cout << "Task ID not found.\n";
     }
 }
+void saveTasksToFile(const vector<Task>& tasks) {
+    ofstream file("tasks.txt");
+    if (!file) {
+        cout << "Error: Could not open file to save tasks!\n";
+        return;
+    }
+
+    for (const auto& task : tasks) {
+        file << task.toString() << endl;
+    }
+
+    file.close();
+}
+void loadTasksFromFile(vector<Task>& tasks) {
+    ifstream file("tasks.txt");
+    if (!file) return; // No file found, start with empty list
+
+    string line;
+    while (getline(file, line)) {
+        tasks.push_back(Task::fromString(line));
+    }
+
+    file.close();
+}
 
 int main() {
-    vector<Task> tasks; // List to store tasks
+    vector<Task> tasks;
+    loadTasksFromFile(tasks);
     int choice;
-
     do {
         cout << "\n===== To-Do List =====\n";
         cout << "1. Add Task\n";
