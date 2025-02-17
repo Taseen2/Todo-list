@@ -12,7 +12,7 @@ void addTask(vector<Task>& tasks) {
     Task newTask;
     newTask.id = tasks.size() + 1; // Assign unique ID
     cout << "Enter task description: ";
-    cin.ignore(); // To clear the newline character
+    cin.ignore(); // To clear the newline charactger
     getline(cin, newTask.title); // Get full-line input
     newTask.isCompleted = false; // Default: not completed
 
