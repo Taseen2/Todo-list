@@ -87,21 +87,17 @@ void deleteTask(vector<Task>& tasks) {
         cout << "No tasks available to delete.\n";
         return;
     }
-
     int taskId;
     cout << "Enter Task ID to delete: ";
     cin >> taskId;
-
     auto it = remove_if(tasks.begin(), tasks.end(), [&](const Task& task) {
         return task.id == taskId;
     });
-
     if (it != tasks.end()) {
         Task deletedTask = *it;  // Store deleted task
         tasks.erase(it, tasks.end());
         saveTasksToFile(tasks);
         cout << "Task deleted successfully! (Type 'undo' to restore)\n";
-
         string choice;
         cin >> choice;
         if (choice == "undo") {
