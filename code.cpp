@@ -22,29 +22,47 @@ struct Task {
         return task;
     }
 };
-
+void saveTasksToFile(const vector<Task>& tasks) {
+    ofstream file("tasks.txt");
+    if (!file) {
+        cout << "Error: Could not open file to save tasks!\n";
+        return;
+    }
+    for (const auto& task : tasks) {
+        file << task.toString() << endl;
+    }
+    file.close();
+}
 void addTask(vector<Task>& tasks) {
     Task newTask;
-    newTask.id = tasks.size() + 1; // Assign unique ID
-    cout << "Enter task description: "; 
-    cin.ignore(); // To clear the newline charactger
-    getline(cin, newTask.title); // Get full-line input
-    newTask.isCompleted = false; // Default: not completed
-    tasks.push_back(newTask); // Add to the list
+    newTask.id = tasks.empty() ? 1 : tasks.back().id + 1;  
+    cout << "Enter task description: ";
+    cin.ignore();  
+    getline(cin, newTask.title);
+    newTask.isCompleted = false;
+    tasks.push_back(newTask);
+    saveTasksToFile(tasks);
     cout << "Task added successfully!\n";
 }
+
 void viewTasks(const vector<Task>& tasks) {
     if (tasks.empty()) {
         cout << "No tasks available.\n";
         return;
     }
+
     cout << "\n===== Task List =====\n";
+    cout << " ID  |       Task        |   Status  \n";
+    cout << "------------------------------------\n";
+
     for (const auto& task : tasks) {
-        cout << "ID: " << task.id << " | ";
-        cout << "Task: " << task.title << " | ";
-        cout << "Status: " << (task.isCompleted ? "Completed" : "Not Completed") << endl;
+        cout << " " << task.id << "   | " 
+             << task.title << "  | " 
+             << (task.isCompleted ? "Completed" : "Not Completed") 
+             << endl;
     }
 }
+
 void markTaskCompleted(vector<Task>& tasks) {
     if (tasks.empty()) {
         cout << "No tasks available to complete.\n";
@@ -69,30 +87,31 @@ void deleteTask(vector<Task>& tasks) {
         cout << "No tasks available to delete.\n";
         return;
     }
+
     int taskId;
     cout << "Enter Task ID to delete: ";
     cin >> taskId;
+
     auto it = remove_if(tasks.begin(), tasks.end(), [&](const Task& task) {
         return task.id == taskId;
     });
+
     if (it != tasks.end()) {
+        Task deletedTask = *it;  // Store deleted task
         tasks.erase(it, tasks.end());
-        cout << "Task deleted successfully!\n";
-        for (size_t i = 0; i < tasks.size(); ++i) {
-            tasks[i].id = i + 1;
+        saveTasksToFile(tasks);
+        cout << "Task deleted successfully! (Type 'undo' to restore)\n";
+
+        string choice;
+        cin >> choice;
+        if (choice == "undo") {
+            tasks.push_back(deletedTask);  // Restore task
+            saveTasksToFile(tasks);
+            cout << "Task restored!\n";
         }
-    } else cout << "Task ID not found.\n";
-}
-void saveTasksToFile(const vector<Task>& tasks) {
-    ofstream file("tasks.txt");
-    if (!file) {
-        cout << "Error: Could not open file to save tasks!\n";
-        return;
+    } else {
+        cout << "Task ID not found.\n";
     }
-    for (const auto& task : tasks) {
-        file << task.toString() << endl;
-    }
-    file.close();
 }
 void loadTasksFromFile(vector<Task>& tasks) {
     ifstream file("tasks.txt");
